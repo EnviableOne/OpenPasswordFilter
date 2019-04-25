@@ -29,12 +29,24 @@ namespace OPFService {
         }
 
         static void Main(string[] args) {
-            ServiceBase.Run(new OPFService());
+            //            ServiceBase.Run(new OPFService());
+            OPFService service = new OPFService();
+            if (Environment.UserInteractive)
+            {
+                service.OnStart(args);
+                Console.WriteLine("Press any key to stop program");
+                Console.Read();
+                service.OnStop();
+            }
+            else
+            {
+                ServiceBase.Run(service);
+            }
         }
 
         protected override void OnStart(string[] args) {
             base.OnStart(args);
-            OPFDictionary d = new OPFDictionary(AppDomain.CurrentDomain.BaseDirectory + "\\opfmatch.txt", AppDomain.CurrentDomain.BaseDirectory + "opfcont.txt");
+            OPFDictionary d = new OPFDictionary(AppDomain.CurrentDomain.BaseDirectory + "\\opfdict.txt", AppDomain.CurrentDomain.BaseDirectory + "opfdict.txt");
             // OPFDictionary d = new OPFDictionary("c:\\windows\\system32\\opfmatch.txt", "c:\\windows\\system32\\opfcont.txt");
             NetworkService svc = new NetworkService(d);
             worker = new Thread(() => svc.main());
